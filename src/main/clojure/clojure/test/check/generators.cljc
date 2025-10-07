@@ -202,13 +202,39 @@
 ;; Internal Helpers
 ;; ---------------------------------------------------------------------------
 
+#?(:clj
+   (defn- shrink-long
+     [^long x]
+     ; Returns a long array (instead of a lazy seq) to avoid allocation churn.
+     ; The size of returned array is log2(abs(x)), computed from the number
+     ; of significant bits.
+     (core/let [size (- 64 (Long/numberOfLeadingZeros (Math/abs x)))
+                ^longs vals (long-array size)]
+       (loop [i 0 n x]
+         (if (zero? n)
+           vals
+           (do
+             (aset vals i (- x n))
+             (recur (inc i) (quot n 2))))))))
+
 (defn- halfs
   [n]
   (take-while #(not= 0 %) (iterate #(quot % 2) n)))
 
-(defn- shrink-int
+(defn- shrink-big-int
   [integer]
   (core/map #(- integer %) (halfs integer)))
+
+(defn- shrink-int
+  "Given a number x, returns a coll of (x-x, x-x/2, x-x/4, x-x/8, ..., x-1)"
+  [x]
+  #?(:clj
+     (if (<= Long/MIN_VALUE x Long/MAX_VALUE)
+       (shrink-long x)
+       (shrink-big-int x))
+
+     :cljs
+     (shrink-big-int x)))
 
 (defn- int-rose-tree
   [value]
