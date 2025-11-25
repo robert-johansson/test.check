@@ -1,6 +1,6 @@
 # Changelog
 
-## next
+## 1.1.2 (2025-11-25)
 
 * TCHECK-160 - Reduce allocation churn on shrink-int
 

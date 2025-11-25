@@ -56,13 +56,13 @@ hold true for all inputs. This lets you write concise, powerful tests.
 #### [CLI/`deps.edn`](https://clojure.org/reference/deps_and_cli) dependency information:
 
 ```clojure
-org.clojure/test.check {:mvn/version "1.1.1"}
+org.clojure/test.check {:mvn/version "1.1.2"}
 ```
 
 #### Leiningen
 
 ```clojure
-[org.clojure/test.check "1.1.1"]
+[org.clojure/test.check "1.1.2"]
 ```
 
 #### Maven
@@ -71,7 +71,7 @@ org.clojure/test.check {:mvn/version "1.1.1"}
 <dependency>
   <groupId>org.clojure</groupId>
   <artifactId>test.check</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 
@@ -80,7 +80,7 @@ org.clojure/test.check {:mvn/version "1.1.1"}
 #### Leiningen
 
 ```clojure
-[org.clojure/test.check "1.1.1"]
+[org.clojure/test.check "1.1.2"]
 ```
 
 #### Maven
@@ -89,7 +89,7 @@ org.clojure/test.check {:mvn/version "1.1.1"}
 <dependency>
   <groupId>org.clojure</groupId>
   <artifactId>test.check</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 
