@@ -1,5 +1,9 @@
 # Changelog
 
+## next
+
+* TCHECK-160 - Reduce allocation churn on shrink-int
+
 ## 1.1.1 (2021-12-01)
 
 * Exclude clojure.core/abs (prepping for use with 1.11)
