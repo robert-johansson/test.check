@@ -111,8 +111,6 @@ All CLJS-available features are fully working on nbb:
 `gen/ratio`, `gen/size-bounded-bigint`.
 
 **Minor limitations**:
-- `file-and-line` in failure reports returns nil (SCI doesn't expose
-  stack trace introspection)
 - Custom `assert-expr` for `(is (check? ...))` is bypassed;
   `assert-check` calls `check-results` directly (same end behavior)
 
