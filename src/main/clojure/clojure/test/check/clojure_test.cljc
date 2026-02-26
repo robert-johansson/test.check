@@ -90,7 +90,11 @@
                       ::defspec true
                       :test `(fn []
                                (clojure.test.check.clojure-test/assert-check
-                                (assoc (~name) :test-var (str '~name)))))
+                                (merge (~name)
+                                       {:test-var (str '~name)}
+                                       #?(:org.babashka/nbb
+                                          (select-keys (meta (var ~name)) [:file :line])
+                                          :default nil)))))
       {:arglists '([] ~'[num-tests & {:keys [seed max-size reporter-fn]}])}
       ([] (let [options# (process-options ~options)]
             (apply ~name (:num-tests options#) (apply concat options#))))

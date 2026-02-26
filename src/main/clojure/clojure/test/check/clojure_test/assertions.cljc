@@ -41,7 +41,7 @@
               :actual m}
              #?(:clj (file-and-line*
                        (test-context-stacktrace (.getStackTrace (Thread/currentThread))))
-                :org.babashka/nbb {:file nil :line nil}
+                :org.babashka/nbb (select-keys m [:file :line])
                 :cljs (t/file-and-line (js/Error.) 4))))))
 
 (defn check?
