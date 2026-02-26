@@ -94,6 +94,28 @@ The nbb port uses two strategies:
    files for minor incompatibilities (`goog.string`, `cljs.test`
    require, multimethod dispatch keys).
 
+### Feature Completeness
+
+All CLJS-available features are fully working on nbb:
+
+- **53/53 generators** — every generator and combinator works
+  (primitives, collections, `fmap`, `bind`, `such-that`, `one-of`,
+  `frequency`, `recursive-gen`, `gen/let`, etc.)
+- **Shrinking** — produces minimal counterexamples
+- **Seeded RNG** — deterministic; same seed produces identical values
+- **`quick-check` options** — `:seed`, `:max-size`, `:reporter-fn`
+- **Exception handling** — exceptions caught and shrunk correctly
+- **`defspec` + `clojure.test`** — pass/fail assertions and reporting
+
+**Not available** (JVM-only, by design): `gen/byte`, `gen/bytes`,
+`gen/ratio`, `gen/size-bounded-bigint`.
+
+**Minor limitations**:
+- `file-and-line` in failure reports returns nil (SCI doesn't expose
+  stack trace introspection)
+- Custom `assert-expr` for `(is (check? ...))` is bypassed;
+  `assert-check` calls `check-results` directly (same end behavior)
+
 ## Latest Releases
 
 * Release notes for each version are available in [`CHANGELOG.markdown`](CHANGELOG.markdown)
