@@ -43,6 +43,57 @@ hold true for all inputs. This lets you write concise, powerful tests.
   * [Developer Information](doc/development.md)
 * [Miscellaneous](#miscellaneous)
 
+## nbb (Node Babashka) Support
+
+This fork adds support for running test.check on
+[nbb](https://github.com/babashka/nbb), ClojureScript's scripting
+environment on Node.js.
+
+### Quick Start
+
+```bash
+npm install long
+nbb --classpath src/main/nbb:src/main/clojure -e '
+(require (quote [clojure.test.check :as tc])
+         (quote [clojure.test.check.generators :as gen])
+         (quote [clojure.test.check.properties :as prop]))
+
+(tc/quick-check 100
+  (prop/for-all [v (gen/vector gen/small-integer)]
+    (= (sort v) (sort (sort v)))))
+'
+```
+
+`defspec` and `clojure.test` integration also work:
+
+```clojure
+(require '[clojure.test :as t]
+         '[clojure.test.check.generators :as gen]
+         '[clojure.test.check.properties :as prop]
+         '[clojure.test.check.clojure-test :refer [defspec]])
+
+(defspec sort-is-idempotent 100
+  (prop/for-all [v (gen/vector gen/small-integer)]
+    (= (sort v) (sort (sort v)))))
+
+(t/run-tests)
+```
+
+### How It Works
+
+The nbb port uses two strategies:
+
+1. **Overlay files** in `src/main/nbb/` that shadow incompatible
+   originals (put `src/main/nbb` first on the classpath):
+   - `random/longs.cljs` — npm `long` package instead of `goog.math.Long`
+   - `random/longs/bit_count_impl.cljs` — matching property name changes
+   - `random.cljs` — `defrecord` instead of `deftype` (SCI limitation)
+   - `rose_tree.cljc` — `defrecord` instead of `deftype`
+
+2. **Reader conditionals** (`:org.babashka/nbb`) in existing `.cljc`
+   files for minor incompatibilities (`goog.string`, `cljs.test`
+   require, multimethod dispatch keys).
+
 ## Latest Releases
 
 * Release notes for each version are available in [`CHANGELOG.markdown`](CHANGELOG.markdown)
