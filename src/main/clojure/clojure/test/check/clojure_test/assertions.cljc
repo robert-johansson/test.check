@@ -9,6 +9,7 @@
 (ns clojure.test.check.clojure-test.assertions
   #?(:cljs (:require-macros [clojure.test.check.clojure-test.assertions.cljs]))
   (:require #?(:clj [clojure.test :as t]
+               :org.babashka/nbb [clojure.test :as t]
                :cljs [cljs.test :as t])))
 
 #?(:clj
@@ -40,6 +41,7 @@
               :actual m}
              #?(:clj (file-and-line*
                        (test-context-stacktrace (.getStackTrace (Thread/currentThread))))
+                :org.babashka/nbb {:file nil :line nil}
                 :cljs (t/file-and-line (js/Error.) 4))))))
 
 (defn check?
@@ -52,6 +54,8 @@
    (defmethod t/assert-expr 'clojure.test.check.clojure-test/check?
      [_ form]
      (check? _ form))
+   :org.babashka/nbb
+   nil ;; SCI handles assert-expr registration differently
    :cljs
    (when (exists? js/cljs.test$macros)
      (defmethod js/cljs.test$macros.assert_expr 'clojure.test.check.clojure-test/check?

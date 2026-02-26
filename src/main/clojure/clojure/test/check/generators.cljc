@@ -17,7 +17,8 @@
             [clojure.string :as string]
             [clojure.test.check.random :as random]
             [clojure.test.check.rose-tree :as rose]
-            #?@(:cljs [[goog.string :as gstring]
+            #?@(:org.babashka/nbb []
+                :cljs [[goog.string :as gstring]
                        [clojure.string]]))
   #?(:cljs (:require-macros [clojure.test.check.generators :refer [let]])))
 
@@ -722,6 +723,8 @@
   [s k]
   #? (:clj
       (.contains ^clojure.lang.ITransientSet s k)
+      :org.babashka/nbb
+      (some? (get s k))
       :cljs
       (some? (-lookup s k))))
 
@@ -1467,6 +1470,7 @@
 (defn- digit?
   [d]
   #?(:clj  (Character/isDigit ^Character d)
+     :org.babashka/nbb (re-matches #"[0-9]" d)
      :cljs (gstring/isNumeric d)))
 
 (defn- +-or---digit?

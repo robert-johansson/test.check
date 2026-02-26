@@ -1,0 +1,27 @@
+{
+  "name": "test.check",
+  "version": "1.0.0",
+  "description": "_test.check_ is a Clojure property-based testing tool inspired by QuickCheck. The core idea of _test.check_ is that instead of enumerating expected input and output for unit tests, you write properties about your function that should hold true for all inputs. This lets you write concise, powerful tests.",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clojure/test.check.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/clojure/test.check/issues"
+  },
+  "homepage": "https://github.com/clojure/test.check#readme",
+  "dependencies": {
+    "long": "^5.3.2"
+  }
+}

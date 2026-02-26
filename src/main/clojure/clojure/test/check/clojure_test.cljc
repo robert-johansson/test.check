@@ -9,6 +9,7 @@
 
 (ns clojure.test.check.clojure-test
   (:require #?(:clj  [clojure.test :as ct]
+               :org.babashka/nbb [clojure.test :as ct]
                :cljs [cljs.test :as ct :include-macros true])
             [clojure.test.check :as tc]
             [clojure.test.check.clojure-test.assertions]
@@ -19,7 +20,10 @@
   [{:keys [result result-data] :as m}]
   (if-let [error (:clojure.test.check.properties/error result-data)]
     (throw error)
-    (ct/is (clojure.test.check.clojure-test/check? m))))
+    #?(:org.babashka/nbb
+       (clojure.test.check.clojure-test.assertions/check-results m)
+       :default
+       (ct/is (clojure.test.check.clojure-test/check? m)))))
 
 (def ^:dynamic *default-test-count* 100)
 
@@ -30,6 +34,7 @@
   (case type
     :complete
     (let [testing-vars #?(:clj ct/*testing-vars*
+                          :org.babashka/nbb ct/*testing-vars*
                           :cljs (:testing-vars ct/*current-env*))
           params       (merge (select-keys args [:result :num-tests :seed
                                                  :time-elapsed-ms])
@@ -165,39 +170,43 @@
   report shrunk results. Defaults to true."
   true)
 
-(when #?(:clj true :cljs (not (and *ns* (re-matches #".*\$macros" (name (ns-name *ns*))))))
+(when #?(:clj true :org.babashka/nbb true :cljs (not (and *ns* (re-matches #".*\$macros" (name (ns-name *ns*))))))
   ;; This check accomodates a number of tools that rebind ct/report
   ;; to be a regular function instead of a multimethod, and may do
   ;; so before this code is loaded (see TCHECK-125)
-  (if-not (instance? #?(:clj clojure.lang.MultiFn :cljs MultiFn) ct/report)
+  (if-not #?(:clj (instance? clojure.lang.MultiFn ct/report)
+             :org.babashka/nbb true ;; ct/report is always a multimethod in SCI
+             :cljs (instance? MultiFn ct/report))
     (binding [*out* #?(:clj *err* :cljs *out*)]
       (println "clojure.test/report is not a multimethod, some reporting functions have been disabled."))
     (let [begin-test-var-method (get-method ct/report #?(:clj  :begin-test-var
+                                                         :org.babashka/nbb [:cljs.test/default :begin-test-var]
                                                          :cljs [::ct/default :begin-test-var]))]
       (defmethod ct/report #?(:clj  :begin-test-var
+                              :org.babashka/nbb [:cljs.test/default :begin-test-var]
                               :cljs [::ct/default :begin-test-var]) [m]
         (reset! last-trial-report (get-current-time-millis))
         (when begin-test-var-method (begin-test-var-method m)))
 
-      (defmethod ct/report #?(:clj ::trial :cljs [::ct/default ::trial]) [m]
+      (defmethod ct/report #?(:clj ::trial :org.babashka/nbb [:cljs.test/default ::trial] :cljs [::ct/default ::trial]) [m]
         (when-let [trial-report-fn (and *report-trials*
                                         (if (true? *report-trials*)
                                           trial-report-dots
                                           *report-trials*))]
           (trial-report-fn m)))
 
-      (defmethod ct/report #?(:clj ::shrinking :cljs [::ct/default ::shrinking]) [m]
+      (defmethod ct/report #?(:clj ::shrinking :org.babashka/nbb [:cljs.test/default ::shrinking] :cljs [::ct/default ::shrinking]) [m]
         (when *report-shrinking*
           (with-test-out*
             (fn []
               (println "Shrinking" (get-property-name m)
                 "starting with parameters" (pr-str (::params m)))))))
 
-      (defmethod ct/report #?(:clj ::complete :cljs [::ct/default ::complete]) [m]
+      (defmethod ct/report #?(:clj ::complete :org.babashka/nbb [:cljs.test/default ::complete] :cljs [::ct/default ::complete]) [m]
         (when *report-completion*
           (prn (::complete m))))
 
-      (defmethod ct/report #?(:clj ::shrunk :cljs [::ct/default ::shrunk]) [m]
+      (defmethod ct/report #?(:clj ::shrunk :org.babashka/nbb [:cljs.test/default ::shrunk] :cljs [::ct/default ::shrunk]) [m]
         (when *report-completion*
           (with-test-out*
             (fn [] (prn m))))))))

@@ -17,3 +17,5 @@ pom.xml.asc
 .idea/
 *.iml
 .cpcache/
+node_modules/
+package-lock.json
